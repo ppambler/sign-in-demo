@@ -39,7 +39,7 @@
 <body>
     <div class="form-wrapper">
         <h1>注册</h1>
-        <form>
+        <form id='signUpForm'>
             <div class="row">
                 <!-- 没有label，那么这个表单字段表示什么，根本无法知晓 -->
                 <label for="">邮箱</label>
@@ -58,6 +58,20 @@
             </div>
         </form>
     </div>
+
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <script>
+        let hash = {}
+        $('#signUpForm').on('submit',(e)=>{
+            e.preventDefault()
+            let need = ['email','password','password_confirmation']
+            need.forEach((name)=>{
+                let value = $('#signUpForm').find(`[name=${name}]`).val()
+                hash[name] = value
+            })
+            console.log(hash)
+        })
+    </script>
 </body>
 
 </html>
