@@ -70,6 +70,13 @@
                 hash[name] = value
             })
             console.log(hash)
+            $.post('/sign_up',hash)
+                .then((response)=>{
+                    console.log('success')
+                    console.log(response)
+                },()=>{
+                    console.log('error')
+                })
         })
     </script>
 </body>

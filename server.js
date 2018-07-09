@@ -31,6 +31,7 @@ var server = http.createServer(function(request, response){
     let string = fs.readFileSync('./sign_up.html','utf8')
     response.statusCode = 200
     response.setHeader('content-Type','text/html;charset=utf-8')
+    // response.setHeader('Access-Control-Allow-Origin','http://127.0.0.1:5500')
     response.write(string)
     response.end()
 
