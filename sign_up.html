@@ -74,7 +74,8 @@
                 .then((response)=>{
                     console.log('success')
                     console.log(response)
-                },()=>{
+                },(request)=>{
+                    alert(request.responseText)
                     console.log('error')
                 })
         })
