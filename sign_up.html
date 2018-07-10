@@ -25,6 +25,8 @@
         .form-wrapper {
             padding: 20px;
             border: 1px solid #ddd;
+            /* 给报错信息留给位置，以防止抖动，为此添加了width */
+            min-width: 401px;
         }
         .form-wrapper .row {
             margin: 10px 0;
@@ -32,6 +34,9 @@
         .form-wrapper .row>label {
             display: inline-block;
             min-width: 4em;
+        }
+        .form-wrapper > #signUpForm .error {
+            color: red;
         }
     </style>
 </head>
@@ -44,14 +49,17 @@
                 <!-- 没有label，那么这个表单字段表示什么，根本无法知晓 -->
                 <label for="">邮箱</label>
                 <input type="text" name="email">
+                <span class="error"></span>
             </div>
             <div class="row">
                 <label for="">密码</label>
                 <input type="password" name='password'>
+                <span class="error"></span>
             </div>
             <div class="row">
                 <label for="">确认密码</label>
                 <input type="password" name="password_confirmation">
+                <span class="error"></span>
             </div>
             <div class="row">
                 <input type="submit" value="注册">
@@ -61,15 +69,43 @@
 
     <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
     <script>
-        let hash = {}
-        $('#signUpForm').on('submit',(e)=>{
+        let $form = $('#signUpForm')
+        
+        $form.on('submit',(e)=>{
             e.preventDefault()
+            let hash = {}
             let need = ['email','password','password_confirmation']
             need.forEach((name)=>{
-                let value = $('#signUpForm').find(`[name=${name}]`).val()
+                let value = $form.find(`[name=${name}]`).val()
                 hash[name] = value
             })
             console.log(hash)
+            // 连续的if……else其实还有更好的解决方案
+            // 需求是无止境的，如需要去掉原先提示的错误信息
+            $form.find('.error').each((index,span)=>{
+                // 值倒过来的forEach
+                $(span).text('')
+            })
+            if(hash['email'] === '') {
+                $form.find('[name="email"]').siblings('.error')
+                    .text('填邮箱呀同学')
+                    return
+            }
+            if(hash['password'] === '') {
+                $form.find('[name="password"]').siblings('.error')
+                    .text('填密码呀同学')
+                    return
+            }
+            if(hash['password_confirmation'] === '') {
+                $form.find('[name="password_confirmation"]').siblings('.error')
+                .text('确认密码呀同学')
+                return
+            }
+            if(hash['password'] !== hash['password_confirmation']) {
+                $form.find('[name="password_confirmation"]').siblings('.error')
+                    .text('密码不匹配')
+                return
+            }
             $.post('/sign_up',hash)
                 .then((response)=>{
                     console.log('success')
@@ -78,7 +114,9 @@
                     let {errors} = request.responseJSON
                     // 判断是否存在email和email是否===‘invalid’
                     if(errors.email && errors.email === 'invalid') {
-                        alert('你的邮箱输错了')
+                        // 可以换成是.siblings()→☞.next()。当然前者更好一点
+                        $form.find('[name="email"]').siblings('.error')
+                            .text('邮箱格式错误')
                     }
                 })
         })
