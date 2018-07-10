@@ -39,8 +39,29 @@ var server = http.createServer(function (request, response) {
 
   }else if(path === '/sign_up' && method === 'POST') {
     readBody(request).then((body)=>{
+      // body →☞email=13790020331%40163.com&……
+      let strings = body.split('&') //['email=……',……]
+      let hash = {}
+      strings.forEach((string)=>{
+        // string = 'email=……'
+        let parts = string.split('=') //['email','……']
+        let key = parts[0]
+        let value = parts[1]
+        hash[key] = value //hash['email'] = '……'
+      })
+      let {email,password,password_confirmation} = hash
+      if(email.indexOf('@') === -1){
+        response.statusCode = 400
+        // 一般都是返回有结构的数据
+        response.write('email is bad')
+      } else if(password !== password_confirmation) {
+        response.statusCode = 400
+        response.write('password not match')
+      } else {
+        response.statusCode = 200
+      }
       console.log(body)
-      response.statusCode = 200
+      console.log(hash)
       response.end()
     })
   } else if (path === '/main.js') {
