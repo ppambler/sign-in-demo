@@ -52,8 +52,15 @@ var server = http.createServer(function (request, response) {
       let {email,password,password_confirmation} = hash
       if(email.indexOf('@') === -1){
         response.statusCode = 400
+        response.setHeader('Content-Type','application/json;charset=utf-8')
         // 一般都是返回有结构的数据
-        response.write('email is bad')
+        response.write(`
+          {
+            "errors": {
+              "email":"invalid"
+            }
+          }
+        `)
       } else if(password !== password_confirmation) {
         response.statusCode = 400
         response.write('password not match')
