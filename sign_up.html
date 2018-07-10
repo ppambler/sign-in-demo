@@ -75,8 +75,11 @@
                     console.log('success')
                     console.log(response)
                 },(request)=>{
-                    console.log(request.responseJSON)
-                    console.log('error')
+                    let {errors} = request.responseJSON
+                    // 判断是否存在email和email是否===‘invalid’
+                    if(errors.email && errors.email === 'invalid') {
+                        alert('你的邮箱输错了')
+                    }
                 })
         })
     </script>
