@@ -37,12 +37,12 @@ var server = http.createServer(function (request, response) {
     response.write(string)
     response.end()
 
-  }else if(path === '/sign_up' && method === 'POST') {
-    readBody(request).then((body)=>{
+  } else if (path === '/sign_up' && method === 'POST') {
+    readBody(request).then((body) => {
       // body →☞email=13790020331%40163.com&……
       let strings = body.split('&') //['email=……',……]
       let hash = {}
-      strings.forEach((string)=>{
+      strings.forEach((string) => {
         // string = 'email=……'
         let parts = string.split('=') //['email','……']
         let key = parts[0]
@@ -50,11 +50,15 @@ var server = http.createServer(function (request, response) {
         // 翻译%40为@字符
         hash[key] = decodeURIComponent(value) //hash['email'] = '……'
       })
-      let {email,password,password_confirmation} = hash
-      if(email.indexOf('@') === -1){
+      let {
+        email,
+        password,
+        password_confirmation
+      } = hash
+      if (email.indexOf('@') === -1) {
         response.statusCode = 400
         // 为了使用jQuery的API
-        response.setHeader('Content-Type','application/json;charset=utf-8')
+        response.setHeader('Content-Type', 'application/json;charset=utf-8')
         // 一般都是返回有结构的数据
         response.write(`
           {
@@ -63,22 +67,38 @@ var server = http.createServer(function (request, response) {
             }
           }
         `)
-      } else if(password !== password_confirmation) {
+      } else if (password !== password_confirmation) {
         response.statusCode = 400
         response.write('password not match')
       } else {
-        var users = fs.readFileSync('./db/users','utf8')
+        var users = fs.readFileSync('./db/users', 'utf8')
         try {
           users = JSON.parse(users)
-        } catch(e) {
+        } catch (e) {
           users = []
         }
-        users.push({email:email,password:password})
-        // 把users这个JSON数组给JSON字符串化，存到db里去，
-        // 毕竟对象只在内存中
-        var usersString  = JSON.stringify(users)
-        fs.writeFileSync('./db/users',usersString)
-        response.statusCode = 200
+        let inUse = false
+        for (let i = 0; i < users.length; i++) {
+          let user = users[i];
+          if (user.email === email) {
+            inUse = true
+            break;
+          }
+        }
+        if (inUse) {
+          response.statusCode = 400
+          response.write('email in use')
+        } else {
+          users.push({
+            email: email,
+            password: password
+          })
+          // 把users这个JSON数组给JSON字符串化，存到db里去，
+          // 毕竟对象只在内存中
+          var usersString = JSON.stringify(users)
+          fs.writeFileSync('./db/users', usersString)
+          response.statusCode = 200
+        }
       }
       console.log(body)
       console.log(hash)
