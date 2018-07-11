@@ -141,6 +141,7 @@ var server = http.createServer(function (request, response) {
         }
       }
       if(found){
+        response.setHeader('Set-Cookie', `sign_in_email=${email}`)
         response.statusCode = 200
       } else {
         response.statusCode = 401
