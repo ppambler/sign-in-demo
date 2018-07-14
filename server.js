@@ -27,10 +27,22 @@ var server = http.createServer(function (request, response) {
 
   console.log('方方说：含查询字符串的路径\n' + pathWithQuery)
 
-  if (path === '/') {
+  if (path === '/js/main.js') {
+    let string = fs.readFileSync('./js/main.js', 'utf8')
+    response.setHeader('Content-Type', 'application/javascript;charset=utf8')
+    response.setHeader('Cache-Control', 'max-age=30')
+    response.write(string)
+    response.end()
+  } else if (path === '/css/default.css') {
+    let string = fs.readFileSync('./css/default.css', 'utf8')
+    response.setHeader('Content-Type', 'text/css;charset=utf8')
+    response.setHeader('Cache-Control', 'max-age=30')
+    response.write(string)
+    response.end()
+  } else if (path === '/') {
     let string = fs.readFileSync('./index.html', 'utf8')
     let cookies = ''
-    if(request.headers.cookie){
+    if (request.headers.cookie) {
       cookies = request.headers.cookie.split('; ') // ['email=1@', 'a=1', 'b=2']
     }
     // console.log(cookies)
@@ -46,7 +58,7 @@ var server = http.createServer(function (request, response) {
     // 有了之后的做法：
     let mySession = sessions[hash.sessionId]
     let email
-    if(mySession) {
+    if (mySession) {
       email = mySession.sign_in_email
     }
     let users = fs.readFileSync('./db/users', 'utf8')
@@ -182,7 +194,9 @@ var server = http.createServer(function (request, response) {
       if (found) {
         // 不直接暴露email
         let sessionId = Math.random() * 100000
-        sessions[sessionId] = {sign_in_email:email}
+        sessions[sessionId] = {
+          sign_in_email: email
+        }
         response.setHeader('Set-Cookie', `sessionId=${sessionId}`)
         response.statusCode = 200
       } else {
