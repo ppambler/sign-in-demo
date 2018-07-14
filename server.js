@@ -36,7 +36,8 @@ var server = http.createServer(function (request, response) {
   } else if (path === '/css/default.css') {
     let string = fs.readFileSync('./css/default.css', 'utf8')
     response.setHeader('Content-Type', 'text/css;charset=utf8')
-    response.setHeader('Cache-Control', 'max-age=30')
+    // response.setHeader('Cache-Control', 'max-age=30')
+    response.setHeader('Expires','"Sat, 14 Jul 2018 05:20:00 GMT"')
     response.write(string)
     response.end()
   } else if (path === '/') {
