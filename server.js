@@ -42,10 +42,20 @@ var server = http.createServer(function (request, response) {
     response.end()
   } else if (path === '/css/default.css') {
     let string = fs.readFileSync('./css/default.css', 'utf8')
+    let LM = 'Sat, 14 Jul 2018 15:45:43 GMT'
+    console.log(request.headers)
+    let temp = request.headers['if-modified-since']
     response.setHeader('Content-Type', 'text/css;charset=utf8')
+    response.setHeader('Last-Modified',LM)
     // response.setHeader('Cache-Control', 'max-age=30')
-    response.setHeader('Expires','"Sat, 14 Jul 2018 05:20:00 GMT"')
-    response.write(string)
+    // response.setHeader('Expires','Sat, 14 Jul 2018 05:20:00 GMT')
+    console.log(temp)
+    if(request.headers['if-modified-since'] === LM){
+      response.statusCode = 304
+    }else  {
+      response.statusCode = 200
+      response.write(string)
+    }
     response.end()
   } else if (path === '/') {
     let string = fs.readFileSync('./index.html', 'utf8')
